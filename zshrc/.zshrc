@@ -22,6 +22,9 @@ source $ZSH/oh-my-zsh.sh
 # Neovim
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
+# Go
+export PATH="$PATH:/usr/local/go/bin"
+
 # User binaries
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -53,3 +56,8 @@ alias gp="git push"
 
 # Television
 export TV_SHELL=zsh
+
+# =========================
+# Local (por máquina, não versionado)
+# =========================
+[ -f "$HOME/.config/zsh/local.zsh" ] && source "$HOME/.config/zsh/local.zsh"
