@@ -4,8 +4,13 @@
 
 local map = vim.keymap.set
 
-map("n", "<C-z>", "u", { desc = "Undo" })
-map("n", "<C-y>", "<C-r>", { desc = "Redo" })
+--- Maps de Undo Redo
+map("i", "<C-z>", "<Esc>u", { desc = "Undo (insert mode)" })
+map("i", "<C-y>", "<Esc><C-r>", { desc = "Redo (insert mode)" })
 map("n", "<C-s>", "<cmd>w<cr>", { desc = "Save" })
 
+--- Save
 map("i", "<C-s>", "<Esc><cmd>w<cr>", { desc = "Save" })
+
+--- Select All
+map("n", "<leader>aa", "ggVG", { desc = "Select all" })

@@ -39,6 +39,8 @@ Definidos em `lua/config/keymaps.lua`:
 |---|---|---|---|
 | `C-z` | Normal | Undo | Por padrão `C-z` suspende o Neovim (`:suspend`); remapeado para comportamento de "undo" como em editores comuns |
 | `C-y` | Normal | Redo | Não existe padrão nativo pra isso; mapeado pra `C-r` (redo real do Vim) |
+| `C-z` | Insert | Undo | Sai do insert (`<Esc>`) e executa undo; termina em modo Normal |
+| `C-y` | Insert | Redo | Sai do insert (`<Esc>`) e executa redo; termina em modo Normal |
 | `C-s` | Normal | Salvar (`:w`) | Atalho comum em outros editores |
 | `C-s` | Insert | Salvar (sai do insert, salva) | Mesma lógica, funcionando também durante digitação |
 
@@ -46,28 +48,63 @@ Definidos em `lua/config/keymaps.lua`:
 local map = vim.keymap.set
 map("n", "<C-z>", "u", { desc = "Undo" })
 map("n", "<C-y>", "<C-r>", { desc = "Redo" })
+map("i", "<C-z>", "<Esc>u", { desc = "Undo (insert mode)" })
+map("i", "<C-y>", "<Esc><C-r>", { desc = "Redo (insert mode)" })
 map("n", "<C-s>", "<cmd>w<cr>", { desc = "Save" })
 map("i", "<C-s>", "<Esc><cmd>w<cr>", { desc = "Save" })
 ```
+
+> Nota: `C-z`/`C-y` no insert mode saem do insert (`<Esc>`) antes de executar o
+> undo/redo, já que esses comandos não existem nativamente dentro do modo
+> insert. O cursor termina em modo Normal — comportamento esperado do Vim.
+
+---
+
+## LSPs instalados (via Mason)
+
+| LSP | Linguagem |
+|---|---|
+| `gopls` | Go |
+| `yaml-language-server` | YAML (com schemas do Kubernetes) |
+| `terraform-ls` | Terraform |
+| `bash-language-server` | Bash |
+| `dockerfile-language-server` | Dockerfile |
+
+Todos com validação, autocomplete e hover funcionando via LSP nativo do Neovim.
 
 ---
 
 ## Keymaps de plugins (`lua/plugins/keymaps.lua`)
 
-Atalhos sob o grupo `<leader>t` (Terraform):
+Grupos registrados no Which-Key:
+
+| Grupo | Nome |
+|---|---|
+| `<leader>t` | Terminal |
+| `<leader>k` | Kubernetes |
+| `<leader>i` | Infra / Terraform |
+
+Atalhos:
 
 | Atalho | Ação |
 |---|---|
+| `<leader>tt` | abrir terminal |
+| `<leader>ka` | `kubectl apply -f %` (aplica o arquivo atual) |
 | `<leader>ti` | `terraform init` |
 | `<leader>tp` | `terraform plan` |
 | `<leader>tf` | `terraform fmt` |
+
+> Nota: `<leader>t` está usado tanto para o grupo "Terminal" quanto para os
+> atalhos de Terraform (`ti`, `tp`, `tf`). Como são sub-chaves diferentes
+> (`tt` vs `ti/tp/tf`) não há conflito, mas vale revisar se quiser separar
+> os grupos por clareza no futuro (ex: mover Terraform pra `<leader>i`).
 
 ---
 
 ## Kubernetes / YAML (`lua/plugins/kubernetes.lua`)
 
 Configura o `yamlls` (LSP de YAML) para aplicar automaticamente os schemas do
-Kubernetes em qualquer arquivo `*.yaml` — dá autocomplete e validação de
+Kubernetes em qualquer arquivo `*.yaml`/`*.yml` — dá autocomplete e validação de
 manifests (Deployment, Service, etc) sem precisar de comentário `# yaml-language-server`
 no topo do arquivo.
 
@@ -75,7 +112,30 @@ no topo do arquivo.
 
 ## Neo-tree (`lua/plugins/neo-tree.lua`)
 
-> ⚠️ Conteúdo ainda não documentado aqui 
+Configuração para exibir arquivos ocultos (dotfiles) e arquivos ignorados pelo
+git por padrão na árvore de arquivos — sem precisar dar toggle manual (`H`)
+toda vez que abre uma sessão nova.
+
+```lua
+return {
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = {
+      filesystem = {
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
+      },
+    },
+  },
+}
+```
+
+| Opção | Efeito |
+|---|---|
+| `hide_dotfiles = false` | mostra arquivos que começam com `.` (ex: `.env`, `.gitignore`) |
+| `hide_gitignored = false` | mostra também arquivos listados no `.gitignore` do projeto |
 
 ---
 
@@ -116,6 +176,8 @@ no topo do arquivo.
 |---|---|
 | `yy` | copia (yank) a linha inteira |
 | `yw` | copia a palavra |
+| `y$` | copia até o fim da linha |
+| `ggVGy` | seleciona o arquivo inteiro e copia |
 | `p` | cola depois do cursor/linha |
 | `P` | cola antes do cursor/linha |
 | `v` | seleção visual (caractere) |
@@ -152,6 +214,26 @@ no topo do arquivo.
 | `<leader>bd` | fecha buffer atual |
 
 > `<leader>` no LazyVim padrão é a tecla **espaço**.
+
+---
+
+## Known issues
+
+### Tree-sitter — `GLIBC_2.39 not found`
+
+**Ambiente:** Ubuntu 22.04.5 LTS (WSL2), `glibc 2.35`.
+
+Algumas versões recentes do parser do `nvim-treesitter` são compiladas exigindo
+`glibc 2.39`, que não existe no Ubuntu 22.04 (só a partir do 24.04).
+
+**Decisão atual:** manter o ambiente como está por enquanto; considerar migração
+para Ubuntu 24.04 no WSL futuramente caso o erro comece a afetar mais parsers
+ou funcionalidades do LazyVim.
+
+**Como verificar sua glibc:**
+```bash
+ldd --version | head -1
+```
 
 ---
 
