@@ -1,0 +1,27 @@
+# --- OS / editor junk ---
+.DS_Store
+*.swp
+*.swo
+*~
+
+# --- Nvim / LazyVim runtime state (não é config, é cache/estado local) ---
+nvim/.config/nvim/.luarc.json
+nvim/.config/nvim/lazy-lock.json.bak
+
+# --- K9s: pode conter contexto/tokens de cluster ---
+k9s/.config/k9s/clusters/
+k9s/.config/k9s/plugins.yaml.bak
+
+# --- Cloud/CLI credentials — nunca versionar ---
+**/config.yaml
+**/*credentials*
+**/*token*
+**/.aws/
+**/.docker/
+
+# --- Logs e caches genéricos ---
+*.log
+.cache/
+
+# --- Backup de migração ---
+*.backup/
