@@ -21,12 +21,19 @@ Foco em Cloud Native / Kubernetes / Platform Engineering.
 | [`tmux/`](./tmux) | Config do tmux (prefix `C-a`, TPM, resurrect/continuum) |
 | [`zshrc/`](./zshrc) | `.zshrc` (oh-my-zsh, tema robbyrussell, aliases git/k8s/terraform) |
 | [`television/`](./television) | Config do [television](https://github.com/alexpasmantier/television) (fuzzy finder) |
+| [`scripts/`](./scripts) | Scripts utilitários (`health.sh` — checagem geral do ambiente) |
 | [`docs/`](./docs) | Documentação detalhada de cada parte do setup |
 
-## Ferramentas (instaladas via script, sem config versionada)
+## Ferramentas instaladas pelo script (sem config versionada)
 
-Go, kubectl, kind, k9s, doctl (sempre na versão mais recente) + `bat` e `fd-find`
-(via apt). Detalhes em [docs/tools-installation.md](./docs/tools-installation.md).
+- **Base:** zsh, tmux, git, ripgrep, bat, fd-find, stow (via apt)
+- **Shell:** `.zshrc` linkado via stow (Oh My Zsh é pré-requisito manual, não instalado pelo script)
+- **Editor:** Neovim (binário oficial, latest release) — LazyVim e LSPs (Mason)
+  são sincronizados automaticamente no bootstrap
+- **Cloud CLIs:** Go, kubectl, kind, k9s, doctl (sempre a versão mais recente)
+- **television:** instalado via script oficial (`install.sh` do repo alexpasmantier/television)
+
+Detalhes de cada instalação: [docs/tools-installation.md](./docs/tools-installation.md).
 
 ## Instalação
 
@@ -36,15 +43,36 @@ cd ~/dotfiles
 ./install.sh
 ```
 
+Isso faz o bootstrap completo, do zero: pacotes base → dotfiles (symlinks + TPM)
+→ Neovim + LazyVim + Mason (LSPs) → television → CLIs cloud (go, kubectl, kind,
+k9s, doctl) → plugins do tmux.
+
+> ⚠️ **Pré-requisito:** o `.zshrc` deste repo assume que `Oh My Zsh` já está
+> instalado em `~/.oh-my-zsh` (`source $ZSH/oh-my-zsh.sh`). O script **não**
+> instala o Oh My Zsh automaticamente — instale manualmente antes de rodar
+> `--dotfiles`, ou o shell vai dar erro ao abrir:
+> ```bash
+> sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+> ```
+
 Também dá pra rodar em partes:
 
 ```bash
-./install.sh --dotfiles   # só cria os symlinks (stow)
-./install.sh --tools      # só instala go/kubectl/kind/k9s/doctl
+./install.sh --base          # zsh, tmux, git, ripgrep, bat, fd-find, stow
+./install.sh --dotfiles      # symlinks (stow) + clone do TPM
+./install.sh --editor        # neovim + bootstrap LazyVim + Mason (LSPs)
+./install.sh --tools         # go, kubectl, kind, k9s, doctl
+./install.sh --tmux-plugins  # instala plugins do TPM (resurrect, continuum, etc)
 ```
 
 O script usa `stow` para linkar cada pasta pra dentro de `$HOME`, então qualquer
 edição feita aqui no repo já reflete direto no ambiente (e vice-versa).
+
+> Depois do `./install.sh`, troque o shell padrão para zsh (se ainda não estiver):
+> ```bash
+> chsh -s $(which zsh)
+> ```
+> Requer logout/login (ou reiniciar o terminal) para valer.
 
 ## Estrutura (padrão Stow)
 
@@ -58,6 +86,17 @@ dotfiles/
 ├── zshrc/.zshrc             → ~/.zshrc
 └── television/.config/television/ → ~/.config/television
 ```
+
+## Health check
+
+```bash
+./scripts/health.sh          # checagem geral do ambiente
+./scripts/health.sh -v       # modo verboso, com versões completas
+```
+
+Confere symlinks, LSPs instalados via Mason, plugins do tmux, PATH e todas as
+CLIs — útil depois de rodar o `install.sh` numa máquina nova, ou pra debugar
+quando algo "some" do ambiente.
 
 ## Documentação
 
