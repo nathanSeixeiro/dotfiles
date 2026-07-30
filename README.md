@@ -101,6 +101,7 @@ quando algo "some" do ambiente.
 ## Documentação
 
 - [docs/neovim.md](./docs/neovim.md) — keymaps customizados + cheatsheet básico de Vim
+- [docs\/tmux-doc.md](.\/docs\/tmux-doc.md) — comandos básicos do tmux + config customizada
 - [docs/tools-installation.md](./docs/tools-installation.md) — instalação das CLIs (go, kubectl, kind, k9s, doctl)
 
 ## Notas
