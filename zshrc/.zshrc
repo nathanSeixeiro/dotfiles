@@ -24,6 +24,7 @@ export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 # Go
 export PATH="$PATH:/usr/local/go/bin"
+export PATH="$PATH:$HOME/go/bin"
 
 # User binaries
 export PATH="$HOME/.local/bin:$PATH"
