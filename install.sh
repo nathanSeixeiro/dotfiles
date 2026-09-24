@@ -125,9 +125,9 @@ install_dotfiles() {
     fi
 
     target_rel="${TARGETS[$pkg]:-}"
-    if [ -n "target_rel"]; then
-      target_path="HOME/$target_rel"
-      if [ -e "target_path" ] && [ ! "$target_path"]; then
+    if [ -n "$target_rel" ]; then
+      target_path="$HOME/$target_rel"
+      if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
         backup_path="${target_path}.bak.$(date +%s)"
         warn "~/$target_rel ja existe origem real - backup em $backup_path"
         mkdir -p "$(dirname "$backup_path")"
