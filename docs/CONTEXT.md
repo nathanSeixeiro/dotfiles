@@ -92,8 +92,8 @@ dotfiles/
 
 ## Decisões importantes tomadas
 
-1. **doctl e k9s**: revertidos para "só instalação" (sem symlink/versionamento),
-   por decisão explícita do usuário — não têm customização pessoal relevante
+1. **k9s, gh e sofka**: mantidos como ferramentas instaladas pelo script, sem
+   symlink ou versionamento de configuração
 2. **Go, kind, kubectl**: idem, só instalação via script
 3. **bat/fd-find**: via `apt`, com tratamento do detalhe Debian/Ubuntu
    (binários instalam como `batcat`/`fdfind` → symlink pra `bat`/`fd` em
@@ -103,9 +103,9 @@ dotfiles/
    (`source $ZSH/oh-my-zsh.sh`)
 5. **television**: instalado via script oficial deles
    (`curl -fsSL .../install.sh | bash`), não via download manual de release
-6. **Versões sempre "latest"**: todos os comandos de instalação (go, kubectl,
-   kind, k9s, doctl) buscam dinamicamente a versão mais recente, nunca fixam
-   versão — decisão explícita do usuário
+6. **Versões sempre "latest"**: os comandos de instalação (go, kubectl, kind e
+   k9s) buscam dinamicamente a versão mais recente; gh e sofka são instalados
+   pelo Homebrew
 7. **`.aws` e `.kube/config` NUNCA entram no repo** — credenciais sensíveis,
    ficam fora do versionamento por design
 
@@ -180,7 +180,7 @@ Ubuntu 24.04 no WSL no futuro.
 ./install.sh --base       # zsh, tmux, git, ripgrep, bat, fd-find, stow
 ./install.sh --dotfiles   # stow + clone TPM
 ./install.sh --editor     # neovim (binário) + lazy sync headless + mason install headless
-./install.sh --tools      # go, kubectl, kind, k9s, doctl
+./install.sh --tools      # go, kubectl, kind, k9s, gh, sofka
 ./install.sh --tmux-plugins  # roda install_plugins do TPM direto
 ```
 

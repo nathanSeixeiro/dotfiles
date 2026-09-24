@@ -149,7 +149,8 @@ check_cmd go
 check_cmd kubectl
 check_cmd kind
 check_cmd k9s
-check_cmd doctl
+check_cmd gh "GitHub CLI"
+check_cmd sofka
 
 # ---------------------------------------------------------------------------
 # 7. Utilitários

@@ -8,7 +8,7 @@
 #   ./install.sh --dotfiles   # só symlinks (stow) + clone do TPM
 #   ./install.sh --base       # só pacotes base (zsh, tmux, git, ripgrep, build tools)
 #   ./install.sh --editor     # só neovim + bootstrap LazyVim + Mason (LSPs)
-#   ./install.sh --tools      # só CLIs (go, kubectl, kind, k9s, doctl, bat, fd)
+#   ./install.sh --tools      # só CLIs (go, kubectl, kind, k9s, gh, sofka, bat, fd)
 #   ./install.sh --tmux-plugins  # só instala plugins do TPM (resurrect, continuum, etc)
 #
 set -euo pipefail
@@ -152,14 +152,17 @@ install_k9s() {
   log "k9s instalado: ${K9S_VERSION}"
 }
 
-install_doctl() {
-  log "Instalando doctl (latest)..."
-  DOCTL_VERSION=$(curl -s https://api.github.com/repos/digitalocean/doctl/releases/latest | grep '"tag_name"' | cut -d '"' -f4 | tr -d 'v')
-  curl -LO "https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz"
-  tar xf "doctl-${DOCTL_VERSION}-linux-amd64.tar.gz"
-  sudo mv doctl /usr/local/bin/doctl
-  rm "doctl-${DOCTL_VERSION}-linux-amd64.tar.gz"
-  log "doctl instalado: ${DOCTL_VERSION}"
+install_brew_tools() {
+  if ! command -v brew &>/dev/null; then
+    err "Homebrew não encontrado no PATH. Instale o Homebrew antes de rodar --tools."
+    return 1
+  fi
+
+  log "Instalando GitHub CLI via Homebrew..."
+  brew list gh &>/dev/null || brew install gh
+
+  log "Instalando sofka via Homebrew..."
+  brew list sofka &>/dev/null || brew install nklmilojevic/sofka/sofka
 }
 
 install_tools() {
@@ -167,7 +170,7 @@ install_tools() {
   install_kubectl
   install_kind
   install_k9s
-  install_doctl
+  install_brew_tools
   log "Todas as CLIs cloud instaladas."
 }
 

@@ -30,7 +30,7 @@ Foco em Cloud Native / Kubernetes / Platform Engineering.
 - **Shell:** `.zshrc` linkado via stow (Oh My Zsh é pré-requisito manual, não instalado pelo script)
 - **Editor:** Neovim (binário oficial, latest release) — LazyVim e LSPs (Mason)
   são sincronizados automaticamente no bootstrap
-- **Cloud CLIs:** Go, kubectl, kind, k9s, doctl (sempre a versão mais recente)
+- **Cloud CLIs:** Go, kubectl, kind, k9s, GitHub CLI e sofka
 - **television:** instalado via script oficial (`install.sh` do repo alexpasmantier/television)
 
 Detalhes de cada instalação: [docs/tools-installation.md](./docs/tools-installation.md).
@@ -45,7 +45,11 @@ cd ~/dotfiles
 
 Isso faz o bootstrap completo, do zero: pacotes base → dotfiles (symlinks + TPM)
 → Neovim + LazyVim + Mason (LSPs) → television → CLIs cloud (go, kubectl, kind,
-k9s, doctl) → plugins do tmux.
+k9s, GitHub CLI e sofka) → plugins do tmux.
+
+> ⚠️ **Pré-requisito:** a etapa `--tools` instala o GitHub CLI e o sofka via
+> [Homebrew](https://brew.sh/). Instale o Homebrew e deixe o comando `brew`
+> disponível no `PATH` antes de executar o script.
 
 > ⚠️ **Pré-requisito:** o `.zshrc` deste repo assume que `Oh My Zsh` já está
 > instalado em `~/.oh-my-zsh` (`source $ZSH/oh-my-zsh.sh`). O script **não**
@@ -61,7 +65,7 @@ Também dá pra rodar em partes:
 ./install.sh --base          # zsh, tmux, git, ripgrep, bat, fd-find, stow
 ./install.sh --dotfiles      # symlinks (stow) + clone do TPM
 ./install.sh --editor        # neovim + bootstrap LazyVim + Mason (LSPs)
-./install.sh --tools         # go, kubectl, kind, k9s, doctl
+./install.sh --tools         # go, kubectl, kind, k9s, gh, sofka
 ./install.sh --tmux-plugins  # instala plugins do TPM (resurrect, continuum, etc)
 ```
 
@@ -102,7 +106,7 @@ quando algo "some" do ambiente.
 
 - [docs/neovim.md](./docs/neovim.md) — keymaps customizados + cheatsheet básico de Vim
 - [docs\/tmux-doc.md](.\/docs\/tmux-doc.md) — comandos básicos do tmux + config customizada
-- [docs/tools-installation.md](./docs/tools-installation.md) — instalação das CLIs (go, kubectl, kind, k9s, doctl)
+- [docs/tools-installation.md](./docs/tools-installation.md) — instalação das CLIs (go, kubectl, kind, k9s, gh, sofka)
 
 ## Notas
 

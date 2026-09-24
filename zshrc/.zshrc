@@ -64,3 +64,5 @@ export TV_SHELL=zsh
 # Local (por máquina, não versionado)
 # =========================
 [ -f "$HOME/.config/zsh/local.zsh" ] && source "$HOME/.config/zsh/local.zsh"
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
