@@ -20,9 +20,9 @@ NVIM_INSTALL_DIR="/opt/nvim-linux-x86_64"
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-log()  { printf "\033[1;32m[install]\033[0m %s\n" "$1"; }
+log() { printf "\033[1;32m[install]\033[0m %s\n" "$1"; }
 warn() { printf "\033[1;33m[warn]\033[0m %s\n" "$1"; }
-err()  { printf "\033[1;31m[error]\033[0m %s\n" "$1" >&2; }
+err() { printf "\033[1;31m[error]\033[0m %s\n" "$1" >&2; }
 
 # ---------------------------------------------------------------------------
 # Pacotes base (apt) — pré-requisitos de tudo mais abaixo
@@ -84,6 +84,21 @@ install_television() {
 }
 
 # ---------------------------------------------------------------------------
+# Nvm (Node latest)
+# ---------------------------------------------------------------------------
+install_node() {
+  log "Instalando Node.js via nvm (latest)"
+  export NVM_DIR="$HOME/.nvm"
+  if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+  fi
+  \. "$NVM_DIR/nvm.sh"
+  nvm install --latest
+  nvm alias default 'lts/*'
+  log "Node $(node -v) / npm $(npm -v) instalados"
+}
+
+# ---------------------------------------------------------------------------
 # Dotfiles (via GNU Stow)
 # ---------------------------------------------------------------------------
 install_dotfiles() {
@@ -93,13 +108,36 @@ install_dotfiles() {
   fi
 
   cd "$DOTFILES_DIR"
+
+  cd "$DOTFILES_DIR"
+
+  declare -A TARGETS=(
+    [nvim]=".config/nvim"
+    [tmux]=".tmux.conf"
+    [zshrc]=".zshrc"
+    [television]=".config/television"
+  )
+
   for pkg in "${PACKAGES[@]}"; do
-    if [ -d "$pkg" ]; then
-      log "Linkando pacote: $pkg"
-      stow --restow --target="$HOME" "$pkg"
-    else
+    if [ ! -d "$pkg" ]; then
       warn "Pacote '$pkg' não encontrado, pulando."
+      continue
     fi
+
+    target_rel="${TARGETS[$pkg]:-}"
+    if [ -n "target_rel"]; then
+      target_path="HOME/$target_rel"
+      if [ -e "target_path" ] && [ ! "$target_path"]; then
+        backup_path="${target_path}.bak.$(date +%s)"
+        warn "~/$target_rel ja existe origem real - backup em $backup_path"
+        mkdir -p "$(dirname "$backup_path")"
+        mv "$target_path" "$backup_path"
+      fi
+    fi
+
+    log "Linkando pkg: $pkg"
+    stow --restow --target="$HOME" "$pkg" ||
+      warn "Falha ao linkar '$pkg' mesmo apos bak"
   done
 
   log "Setup do tmux plugin manager (TPM)..."
@@ -190,8 +228,8 @@ bootstrap_lazyvim() {
   # dispara) pode ser cortado no meio, causando "Package is already installing".
   nvim --headless \
     -c "autocmd User LazyDone qa" \
-    -c "Lazy! sync" \
-    || warn "Lazy sync retornou erro — abra o nvim manualmente para checar (:Lazy)."
+    -c "Lazy! sync" ||
+    warn "Lazy sync retornou erro — abra o nvim manualmente para checar (:Lazy)."
 
   log "Instalando LSPs via Mason (gopls, yaml-language-server, terraform-ls, bash-language-server, dockerfile-language-server)..."
   # Carrega o mason.nvim explicitamente antes de chamar MasonInstall, já que
@@ -201,8 +239,8 @@ bootstrap_lazyvim() {
     -c "lua require('mason')" \
     -c "MasonInstall gopls yaml-language-server terraform-ls bash-language-server dockerfile-language-server" \
     -c "autocmd User MasonToolsUpdateCompleted qa" \
-    -c "lua vim.defer_fn(function() vim.cmd('qa') end, 90000)" \
-    || warn "Mason install retornou erro — abra o nvim e rode :Mason manualmente para checar."
+    -c "lua vim.defer_fn(function() vim.cmd('qa') end, 90000)" ||
+    warn "Mason install retornou erro — abra o nvim e rode :Mason manualmente para checar."
 
   log "LazyVim + Mason configurados."
   warn "Recomendado: abra o nvim normalmente uma vez (nvim) para confirmar que tudo terminou de instalar (treesitter parsers, LSPs)."
@@ -231,20 +269,23 @@ install_tmux_plugins() {
 # ---------------------------------------------------------------------------
 main() {
   case "${1:-all}" in
-    --dotfiles)     install_dotfiles ;;
-    --base)         install_base_packages ;;
-    --editor)       install_editor ;;
-    --tools)        install_tools ;;
-    --tmux-plugins) install_tmux_plugins ;;
-    all)
-      install_base_packages
-      install_dotfiles
-      install_editor
-      install_television
-      install_tools
-      install_tmux_plugins
-      ;;
-    *) err "Argumento inválido: $1"; exit 1 ;;
+  --dotfiles) install_dotfiles ;;
+  --base) install_base_packages ;;
+  --editor) install_editor ;;
+  --tools) install_tools ;;
+  --tmux-plugins) install_tmux_plugins ;;
+  all)
+    install_base_packages
+    install_dotfiles
+    install_editor
+    install_television
+    install_tools
+    install_tmux_plugins
+    ;;
+  *)
+    err "Argumento inválido: $1"
+    exit 1
+    ;;
   esac
   log "Concluído."
 }

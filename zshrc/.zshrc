@@ -29,6 +29,10 @@ export PATH="$PATH:$HOME/go/bin"
 # User binaries
 export PATH="$HOME/.local/bin:$PATH"
 
+# Node via nvm
+export NVM_DIR="$HOME/.nvm"
+[-s "$HOME/nvm.sh"] && "$NVM_DIR/nvm.sh"
+nvm use default &>/dev/null
 
 # =========================
 # Aliases
@@ -51,7 +55,8 @@ alias gaa="git add ."
 alias gc="git commit"
 alias gp="git push"
 alias gpl="git pull"
-
+alias gw="git switch"
+alias gwm="git switch main" 
 
 # =========================
 # Tools
